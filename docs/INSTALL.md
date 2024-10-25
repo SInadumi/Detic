@@ -31,3 +31,11 @@ Our project uses two submodules, [CenterNet2](https://github.com/xingyizhou/Cent
 cd third_party/Deformable-DETR/models/ops
 ./make.sh
 ```
+
+### Example poetry environment setup
+```bash
+git clone https://github.com/facebookresearch/Detic.git --recurse-submodules
+cd Detic
+git clone git@github.com:facebookresearch/detectron2.git
+poetry install
+```
