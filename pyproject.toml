@@ -6,8 +6,9 @@ authors = ["SInadumi <inazumi19@icloud.com>"]
 readme = "README.md"
 package-mode=true
 packages = [
-    { include = "detic"},
-    { include = "detectron2", from = "detectron2"}
+    { include = "detic" },
+    { include = "detectron2", from = "detectron2" },
+    { include = "dataset_utils", from = "tools" }
 ]
 
 [tool.poetry.dependencies]
@@ -45,6 +46,9 @@ tqdm = ">=4.29.0"
 fvcore = ">=0.1.5,<0.1.6"
 iopath = ">=0.1.7,<0.1.10"
 hydra-core = ">=1.1"
+h5py = "^3.12.1"
+dataclasses-json = "^0.6.1"
+pydantic = "^2.9.2"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.4"
