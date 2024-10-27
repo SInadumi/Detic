@@ -154,7 +154,7 @@ class DeticCascadeROIHeads(CascadeROIHeads):
             predictor, predictions, proposals = head_outputs[-1]
             boxes = predictor.predict_boxes(
                 (predictions[0], predictions[1]), proposals)
-            pred_instances, _ = fast_rcnn_inference(
+            pred_instances, kept_indices = fast_rcnn_inference(
                 boxes,
                 scores,
                 image_sizes,
@@ -162,7 +162,7 @@ class DeticCascadeROIHeads(CascadeROIHeads):
                 predictor.test_nms_thresh,
                 predictor.test_topk_per_image,
             )
-            return pred_instances
+            return pred_instances, kept_indices
 
 
     def forward(self, images, features, proposals, targets=None,
@@ -178,7 +178,7 @@ class DeticCascadeROIHeads(CascadeROIHeads):
             else:
                 proposals = self.get_top_proposals(proposals)
             
-            losses = self._forward_box(features, proposals, targets, \
+            losses, _ = self._forward_box(features, proposals, targets, \
                 ann_type=ann_type, classifier_info=classifier_info)
             if ann_type == 'box' and targets[0].has('gt_masks'):
                 mask_losses = self._forward_mask(features, proposals)
@@ -191,10 +191,10 @@ class DeticCascadeROIHeads(CascadeROIHeads):
                     device=proposals[0].objectness_logits.device))
             return proposals, losses
         else:
-            pred_instances = self._forward_box(
+            pred_instances, kept_indices = self._forward_box(
                 features, proposals, classifier_info=classifier_info)
             pred_instances = self.forward_with_given_boxes(features, pred_instances)
-            return pred_instances, {}
+            return pred_instances, kept_indices
 
 
     def get_top_proposals(self, proposals):
