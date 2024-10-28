@@ -161,14 +161,16 @@ def extract_region_feats(model, batched_inputs) -> dict:
     )  # class predictions after per-class NMS, [#boxes], class value in [0, C]
     region_feats = box_features[
         kept_indices[0]
-    ].cpu() # region features, [#boxes, feats]
+    ].cpu() # region features, [#boxes, feats(#proposal_boxes, out_size, out_size) ]
 
     # save features of detection regions (after per-class NMS)
     saved_dict = {}
     saved_dict["boxes"] = boxes
     saved_dict["scores"] = scores
     saved_dict["classes"] = classes
-    saved_dict["feats"] = region_feats
+    saved_dict["feats"] = torch.flatten(
+        region_feats, start_dim=1,
+    )  # [#boxes, #proposal_boxes * out_size * out_size]
 
     return saved_dict
 
@@ -213,7 +215,7 @@ def main():
                 with torch.no_grad():
                     batched_inputs = get_inputs(export.predictor, image)
                     output = extract_region_feats(export.predictor.model, [batched_inputs])
-                
+
                 output_fp.create_dataset(
                     f"{scenario_id}/{image_id}/boxes", data=output["boxes"]
                 )
