@@ -33,7 +33,11 @@ def setup_cfg(args):
     cfg.MODEL.RETINANET.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = args.confidence_threshold
+    # NOTE: https://pytorch.org/vision/main/generated/torchvision.ops.batched_nms.html
+    cfg.MODEL.RETINANET.NMS_THRESH_TEST = args.nms_threshold
+    cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = args.nms_threshold
     cfg.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'rand' # load later
+    cfg.TEST.DETECTIONS_PER_IMAGE = 256
     if not args.pred_all_class:
         cfg.MODEL.ROI_HEADS.ONE_CLASS_PER_PROPOSAL = True
     cfg.freeze()
@@ -81,6 +85,12 @@ def get_parser():
         type=float,
         default=0.1,
         help="Minimum score for instance predictions to be shown",
+    )
+    parser.add_argument(
+        "--nms-threshold",
+        type=float,
+        default=0.9,
+        help="Maximum score for non-maximum suppression to limit object duplicates",
     )
     parser.add_argument(
         "--opts",
@@ -141,7 +151,7 @@ def extract_region_feats(model, batched_inputs) -> dict:
 
     box_roi_pool = MultiScaleRoIAlign(
         featmap_names=model.roi_heads.in_features,
-        output_size=7,
+        output_size=2,
         sampling_ratio=2,
     )
     proposal_boxes = [x.proposal_boxes.tensor for x in proposals]
