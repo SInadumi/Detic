@@ -37,7 +37,7 @@ def setup_cfg(args):
     cfg.MODEL.RETINANET.NMS_THRESH_TEST = args.nms_threshold
     cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = args.nms_threshold
     cfg.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'rand' # load later
-    cfg.TEST.DETECTIONS_PER_IMAGE = 256
+    cfg.TEST.DETECTIONS_PER_IMAGE = args.detections_per_image
     if not args.pred_all_class:
         cfg.MODEL.ROI_HEADS.ONE_CLASS_PER_PROPOSAL = True
     cfg.freeze()
@@ -91,6 +91,12 @@ def get_parser():
         type=float,
         default=0.9,
         help="Maximum score for non-maximum suppression to limit object duplicates",
+    )
+    parser.add_argument(
+        "--detections-per-image",
+        type=int,
+        default=256,
+        help="Maximum number of objects to detect"
     )
     parser.add_argument(
         "--opts",
