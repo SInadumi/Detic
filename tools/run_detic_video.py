@@ -32,7 +32,11 @@ def setup_cfg(args):
     cfg.MODEL.RETINANET.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = args.confidence_threshold
+    # NOTE: https://pytorch.org/vision/main/generated/torchvision.ops.batched_nms.html
+    cfg.MODEL.RETINANET.NMS_THRESH_TEST = 0.7
+    cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = 0.7
     cfg.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'rand' # load later
+    cfg.TEST.DETECTIONS_PER_IMAGE = 256
     if not args.pred_all_class:
         cfg.MODEL.ROI_HEADS.ONE_CLASS_PER_PROPOSAL = True
     cfg.freeze()
